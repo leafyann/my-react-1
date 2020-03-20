@@ -7,7 +7,7 @@ export default class TodoList extends Component{
     todos: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
-      isCompleted: PropTypes.bool.isRequired
+      completed: PropTypes.bool.isRequired
     })).isRequired,
     onCompletedChangeCheckbox: PropTypes.func
   }
@@ -17,7 +17,7 @@ export default class TodoList extends Component{
         {/* <TodoItem todos={this.props} /> */}
         {this.props.todos.map(todo => {
         return (
-         // <TodoItem key={todo.id} id={todo.id} title={todo.title} isCompleted={todo.isCompleted} />
+         // <TodoItem key={todo.id} id={todo.id} title={todo.title} completed={todo.completed} />
          <TodoItem 
           key={todo.id} 
           {...todo} 

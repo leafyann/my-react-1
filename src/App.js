@@ -6,6 +6,8 @@ import {
   Like
 } from './components'
 
+import {getTodos} from './services'
+
 
 export default class App extends Component {
   // state={
@@ -17,19 +19,47 @@ export default class App extends Component {
       title:'todos',
       desc: 'finish it today',
       // article: '<div>abcdefghijklmnopqrstuvwxyz <i>cba</i></div>',
-      todos: [{
-        id: 1,
-        title: 'meal',
-        time: '20mins',
-        isCompleted: true
-      },
-      {
-        id: 2,
-        title: 'sleep',
-        time: '8hrs',
-        isCompleted: false
-      }]
+      todos: [],
+      isLoading: false
+      // [{
+      //   id: 1,
+      //   title: 'meal',
+      //   time: '20mins',
+      //   completed: true
+      // },
+      // {
+      //   id: 2,
+      //   title: 'sleep',
+      //   time: '8hrs',
+      //   completed: false
+      // }]
     }
+  }
+
+  getData = () => {
+    this.setState({
+      isLoading: true
+    })
+    getTodos().then(resp => {
+      console.log(resp)
+      if(resp.status === 200){
+        this.setState({
+          todos: resp.data
+        })
+      } else {
+        //处理错误
+      }
+    }).catch(err => {
+      console.log(err)
+    }).finally(() =>{
+      this.setState({
+        isLoading: false
+      })
+    })
+  }
+
+  componentDidMount(){
+    this.getData()
   }
 
   addTodo =(todoTitle, callbackFunc) => {
@@ -38,7 +68,7 @@ export default class App extends Component {
     // todos_list.push({
     //   id: Math.random(),
     //   title: todoTitle,
-    //   isCompleted: false
+    //   completed: false
     // })
     // this.setState(
     //   {todos: todos_list}
@@ -47,10 +77,11 @@ export default class App extends Component {
       todos: this.state.todos.concat({
         id: Math.random(),
         title: todoTitle,
-        isCompleted: false
+        completed: false
       })
     })
     callbackFunc()
+    //先post，再把post的结果Push到状态里面，后端接收数据会返回成功或者要重新接受一次表格。
   }
 
   onCompletedChangeCheckbox = (id) => {
@@ -59,7 +90,7 @@ export default class App extends Component {
       return{
         todos: preState.todos.map(todo_data => {
           if (todo_data.id === id){
-            todo_data.isCompleted = !todo_data.isCompleted
+            todo_data.completed = !todo_data.completed
           }
           return todo_data
         })
@@ -72,7 +103,12 @@ export default class App extends Component {
       <Fragment>
         <TodoHeader desc={this.state.desc} x={1} y={2} class="some-class"><i>{this.state.title}</i></TodoHeader>
         <TodoInput addTodo = {this.addTodo} btnText="Add" />
-        <TodoList todos={this.state.todos} onCompletedChangeCheckbox={this.onCompletedChangeCheckbox} />
+        {
+          this.state.isLoading ? 
+          <div>Loading...</div> : 
+          <TodoList todos={this.state.todos} onCompletedChangeCheckbox={this.onCompletedChangeCheckbox} />
+        }
+        
         {/* {
           this.state.todos.map(todo => {
           return <div key={todo.id}>{todo.title}</div>
